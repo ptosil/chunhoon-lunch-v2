@@ -1,0 +1,33 @@
+name: Auto Update Lunch
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 00:00 UTC → 한국시간 9시
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run get_lunch.py
+        run: python get_lunch.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add lunch.json
+          git commit -m "🍱 자동 급식 정보 업데이트"
+          git push
