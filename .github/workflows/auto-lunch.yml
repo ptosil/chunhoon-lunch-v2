@@ -2,12 +2,14 @@ name: Auto Update Lunch
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 00:00 UTC → 한국시간 9시
+    - cron: '0 0 * * *'  # 매일 00:00 UTC (한국시간 오전 9시)
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # ✅ GitHub에 push 권한을 줌
 
     steps:
       - name: Checkout repository
