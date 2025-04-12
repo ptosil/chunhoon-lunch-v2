@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>오늘의 급식 - 충훈고 3학년 7반</title>
+  <style>
+    body {
+      background: #e0f7ff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #0077b6;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .card h2 {
+      color: #0096c7;
+      margin-bottom: 12px;
+    }
+    .meal-item {
+      font-size: 18px;
+      margin: 6px 0;
+    }
+    input[type="date"] {
+      padding: 8px 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>충훈고 3학년 7반</h1>
+  <input type="date" id="date-picker" />
+
+  <div class="card" id="meal-card">
+    <h2>급식 정보 🍱</h2>
+    <div id="meal-list">날짜를 선택하세요</div>
+  </div>
+
+  <script>
+    const picker = document.getElementById("date-picker");
+    const mealList = document.getElementById("meal-list");
+
+    picker.addEventListener("change", () => {
+      const selectedDate = picker.value;
+      if (selectedDate) {
+        loadLunch(selectedDate);
+      }
+    });
+
+    async function loadLunch(date) {
+      try {
+        const res = await fetch("lunch.json");
+        const data = await res.json();
+
+        const key1 = date;
+        const key2 = date.replaceAll("-", "");
+        const meals = data[key1] || data[key2];
+
+        console.log("선택된 날짜:", date);
+        console.log("시도할 키:", key1, key2);
+        console.log("lunch.json 데이터 키 목록:", Object.keys(data));
+
+        mealList.innerHTML = "";
+
+        if (!meals || meals.length === 0) {
+          mealList.textContent = "이 날은 급식이 없습니다.";
+          return;
+        }
+
+        meals.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "meal-item";
+          div.textContent = "🥗 " + item;
+          mealList.appendChild(div);
+        });
+      } catch (err) {
+        mealList.textContent = "데이터를 불러오지 못했습니다.";
+        console.error(err);
+      }
+    }
+
+    // 오늘 날짜 자동 선택
+    const today = new Date().toISOString().slice(0, 10);
+    picker.value = today;
+    loadLunch(today);
+  </script>
+
+</body>
+</html>
