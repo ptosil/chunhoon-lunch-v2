@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>오늘의 급식 - 충훈고 3학년 7반</title>
   <style>
     body {
@@ -16,7 +16,7 @@
     .card {
       background: white;
       border-radius: 16px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       max-width: 400px;
       margin: 30px auto;
       padding: 20px;
@@ -26,37 +26,38 @@
       margin-bottom: 12px;
     }
     .meal-item {
-      font-size: 18px;
-      margin: 6px 0;
+      text-align: left;
+      margin: 5px 0;
+      font-size: 16px;
     }
     input[type="date"] {
-      padding: 8px 14px;
+      padding: 10px;
       font-size: 16px;
-      border: 1px solid #ccc;
+      border: 2px solid #0077b6;
       border-radius: 8px;
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
+  <h1>🍱 충훈고 3학년 7반 급식표</h1>
 
-  <h1>충훈고 3학년 7반</h1>
-  <input type="date" id="date-picker" />
-
-  <div class="card" id="meal-card">
-    <h2>급식 정보 🍱</h2>
-    <div id="meal-list">날짜를 선택하세요</div>
+  <div class="card">
+    <h2>📅 날짜 선택</h2>
+    <input type="date" id="dateInput" />
+    <div id="mealList" style="margin-top: 20px;"></div>
   </div>
 
   <script>
-    const picker = document.getElementById("date-picker");
-    const mealList = document.getElementById("meal-list");
+    const dateInput = document.getElementById("dateInput");
+    const mealList = document.getElementById("mealList");
 
-    picker.addEventListener("change", () => {
-      const selectedDate = picker.value;
-      if (selectedDate) {
-        loadLunch(selectedDate);
-      }
+    // 오늘 날짜 기본 설정
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.value = today;
+    loadLunch(today);
+
+    dateInput.addEventListener("change", (e) => {
+      loadLunch(e.target.value);
     });
 
     async function loadLunch(date) {
@@ -64,14 +65,13 @@
         const res = await fetch("lunch.json");
         const data = await res.json();
 
-        const key1 = date;
-        const key2 = date.replaceAll("-", "");
-        const meals = data[key1] || data[key2];
+        const key = date.replaceAll("-", "");  // 예: 2025-04-14 → 20250414
+        console.log("✅ 선택된 날짜:", date);
+        console.log("🧩 사용된 키:", key);
+        console.log("📦 lunch.json 전체 데이터:", data);
+        console.log("🍱 해당 날짜의 급식:", data[key]);
 
-        console.log("선택된 날짜:", date);
-        console.log("시도할 키:", key1, key2);
-        console.log("lunch.json 데이터 키 목록:", Object.keys(data));
-
+        const meals = data[key];
         mealList.innerHTML = "";
 
         if (!meals || meals.length === 0) {
@@ -87,15 +87,9 @@
         });
       } catch (err) {
         mealList.textContent = "데이터를 불러오지 못했습니다.";
-        console.error(err);
+        console.error("❌ lunch.json 불러오기 실패:", err);
       }
     }
-
-    // 오늘 날짜 자동 선택
-    const today = new Date().toISOString().slice(0, 10);
-    picker.value = today;
-    loadLunch(today);
   </script>
-
 </body>
 </html>
